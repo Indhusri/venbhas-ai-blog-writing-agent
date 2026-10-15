@@ -89,7 +89,7 @@ const server = http.createServer(async (request, response) => {
       if (error instanceof ProviderConfigurationError) return sendJson(response, 503, { error: error.message });
       if (error.name === 'TimeoutError' || error.name === 'AbortError') return sendJson(response, 504, { error: 'The AI service took too long to respond. Please try again.' });
       if (error.message?.startsWith('Request is too large') || error.message?.startsWith('The request could not')) return sendJson(response, 400, { error: error.message });
-      console.error('Article generation failed:', error.message);
+      console.error(`Article generation failed${error.status ? ` (HTTP ${error.status})` : ''}:`, error.message);
       return sendJson(response, 502, { error: error.message || 'Something went wrong while generating the article. Please try again.' });
     }
   }

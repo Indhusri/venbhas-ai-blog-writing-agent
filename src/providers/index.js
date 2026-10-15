@@ -42,7 +42,16 @@ const openAICompatibleProvider = {
     });
 
     if (!response.ok) {
-      const err = new Error('The AI service could not complete the request. Check your provider settings and try again.');
+      const messages = {
+        400: 'Google rejected the request. Check that the model name is correct and available for your API key.',
+        401: 'Google did not accept the API key. Check that the full key is in .env, then restart the server.',
+        403: 'Google denied access to this API key or project. Check the key restrictions and Gemini API access in Google AI Studio.',
+        404: 'Google could not find the requested model or endpoint. Check AI_MODEL and AI_BASE_URL in .env.',
+        429: 'The Gemini free-tier request limit was reached. Wait for the limit to reset, then try again.',
+        500: 'Google AI Studio is temporarily having a problem. Wait a moment and try again.',
+        503: 'Google AI Studio is temporarily unavailable. Wait a moment and try again.'
+      };
+      const err = new Error(messages[response.status] || `The AI provider returned an error (HTTP ${response.status}). Check its settings and try again.`);
       err.status = response.status;
       throw err;
     }
